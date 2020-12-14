@@ -14,6 +14,7 @@ mongoose.set('useCreateIndex',true);
 /// MIDDLEWARE
 app.use(bodyParser.json());
 app.use(cookieParser());
+const { authenticate } = require('./middleware/auth'); 
 
 /// MODELS
 const { User } = require('./models/user');
@@ -53,15 +54,18 @@ app.post('/api/user/login',(req,res)=>{
     })
 });
 
-app.get('/api/books',(req,res)=>{
-    let token = req.cookies.auth;
 
-    User.findByToken(token,(err,user)=>{
-        if(err) throw err;
-        if(!user) return res.status(401).send({ message:'bad token'});
-        res.status(200).send(user)
-    })
+app.get('/api/books',authenticate,(req,res)=>{
+    res.status(200).send(req.email);
+
+    // let token = req.cookies.auth;
+    // User.findByToken(token,(err,user)=>{
+    //     if(err) throw err;
+    //     if(!user) return res.status(401).send({ message:'bad token'});
+    //     res.status(200).send(user)
+    // })
 })
+
 
 const port = process.env.PORT || 3001;
 app.listen(port,()=>{
