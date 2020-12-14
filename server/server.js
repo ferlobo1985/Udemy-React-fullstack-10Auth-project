@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const app = express();
 
@@ -12,6 +13,7 @@ mongoose.set('useCreateIndex',true);
 
 /// MIDDLEWARE
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 /// MODELS
 const { User } = require('./models/user');
@@ -31,6 +33,7 @@ app.post('/api/user',(req,res)=>{
 
 
 app.post('/api/user/login',(req,res)=>{
+
     // 1 - Find the user, if good ->
     User.findOne({'email': req.body.email},(err, user)=>{
         if(!user) res.json({message:'User not found'});
@@ -44,13 +47,21 @@ app.post('/api/user/login',(req,res)=>{
             
             user.generateToken((err,user)=>{
                 if(err) return res.status(400).send(err);
-                res.cookie('x-auth', user.token).send('ok')
+                res.cookie('auth', user.token).send('ok')
             })
         })
     })
 });
 
+app.get('/api/books',(req,res)=>{
+    let token = req.cookies.auth;
 
+    User.findByToken(token,(err,user)=>{
+        if(err) throw err;
+        if(!user) return res.status(401).send({ message:'bad token'});
+        res.status(200).send(user)
+    })
+})
 
 const port = process.env.PORT || 3001;
 app.listen(port,()=>{
