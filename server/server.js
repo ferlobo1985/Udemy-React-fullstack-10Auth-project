@@ -23,7 +23,7 @@ const { User } = require('./models/user');
 app.post('/api/user',(req,res)=>{
     const user = new User({
         email: req.body.email,
-        password: req.body.spassword
+        password: req.body.password
     });
 
     user.save((err,doc)=>{
