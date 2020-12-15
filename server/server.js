@@ -2,9 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const config = require('./config/config').get(process.env.NODE_ENV);
 const app = express();
 
-const mongoUri = 'mongodb+srv://admin:testing123@cluster0.3nee9.mongodb.net/authApp?retryWrites=true&w=majority';
+const mongoUri = config.DATABASE;
 mongoose.connect(mongoUri,{
     useNewUrlParser: true,
     useUnifiedTopology: true
